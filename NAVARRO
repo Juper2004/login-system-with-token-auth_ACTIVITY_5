@@ -1,0 +1,169 @@
+using System;
+
+class Program
+{
+    static string[,] users = new string[,]
+    {
+        {"admin", "12345"},
+        {"user1", "password"},
+        {"juan", "pilipinas"}
+    };
+
+    static string token = null; 
+    static int loginAttempts = 3;  
+
+    static void Main(string[] args)
+    {
+        bool running = true;
+        while (running)
+        {
+            Console.WriteLine("\n===== MAIN MENU =====");
+            Console.WriteLine("1. Login");
+            Console.WriteLine("2. Global Check (String Exercises)");
+            Console.WriteLine("3. Authorization Check");
+            Console.WriteLine("4. Logout");
+            Console.WriteLine("5. Exit");
+            Console.Write("Choose an option: ");
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    Login();
+                    break;
+                case "2":
+                    GlobalCheck();
+                    break;
+                case "3":
+                    AuthorizationCheck();
+                    break;
+                case "4":
+                    Logout();
+                    break;
+                case "5":
+                    running = false;
+                    break;
+                default:
+                    Console.WriteLine("Invalid option. Please try again.");
+                    break;
+            }
+        }
+    }
+
+    
+    static void Login()
+    {
+        if (token != null)
+        {
+            Console.WriteLine("Already logged in!");
+            return;
+        }
+
+        while (loginAttempts > 0)
+        {
+            Console.Write("Enter username: ");
+            string username = Console.ReadLine();
+            Console.Write("Enter password: ");
+            string password = Console.ReadLine();
+
+            if (ValidateLogin(username, password))
+            {
+                token = GenerateToken(username, password);
+                Console.WriteLine("✅ Login successful!");
+                Console.WriteLine("Generated Token: " + token);
+                return;
+            }
+            else
+            {
+                loginAttempts--;
+                Console.WriteLine($"❌ Invalid credentials. Attempts left: {loginAttempts}");
+            }
+        }
+        Console.WriteLine("Account locked. Too many failed login attempts.");
+    }
+
+    
+    static bool ValidateLogin(string username, string password)
+    {
+        for (int i = 0; i < users.GetLength(0); i++)
+        {
+            if (users[i, 0].Equals(username, StringComparison.OrdinalIgnoreCase) &&
+                users[i, 1] == password)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    
+    static string GenerateToken(string username, string password)
+    {
+        char[] passArr = password.ToCharArray();
+        Array.Reverse(passArr);
+        return new string(passArr) + username;
+    }
+
+    
+    static void GlobalCheck()
+    {
+        Console.WriteLine("\n--- STRING EXERCISES ---");
+        Console.WriteLine("1. Reverse a Sentence");
+        Console.WriteLine("2. Word Search in Paragraph");
+        Console.Write("Choose an exercise: ");
+        string choice = Console.ReadLine();
+
+        if (choice == "1")
+        {
+            Console.Write("Enter a sentence: ");
+            string sentence = Console.ReadLine();
+            string[] words = sentence.Split(' ');
+            Array.Reverse(words);
+            Console.WriteLine("Reversed Sentence: " + string.Join(" ", words));
+        }
+        else if (choice == "2")
+        {
+            string paragraph = "The quick brown fox jumps over the lazy dog.";
+            Console.WriteLine("Paragraph: " + paragraph);
+            Console.Write("Enter a word to search: ");
+            string word = Console.ReadLine();
+
+            if (paragraph.Contains(word, StringComparison.OrdinalIgnoreCase))
+                Console.WriteLine($"✅ The word \"{word}\" was found!");
+            else
+                Console.WriteLine($"❌ The word \"{word}\" was NOT found.");
+        }
+        else
+        {
+            Console.WriteLine("Invalid choice.");
+        }
+    }
+
+    
+    static void AuthorizationCheck()
+    {
+        if (token != null)
+        {
+            Console.WriteLine("🔒 You're currently viewing this page as an authorized user.");
+        }
+        else
+        {
+            Console.WriteLine("❌ Unauthorized view. Please log in to access this page.");
+        }
+    }
+
+    
+    static void Logout()
+    {
+        if (token == null)
+        {
+            Console.WriteLine("No user is currently logged in.");
+        }
+        else
+        {
+            token = null;
+            loginAttempts = 3; 
+            Console.WriteLine("✅ Logged out successfully.");
+        }
+    }
+}
